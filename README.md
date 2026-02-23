@@ -2,7 +2,7 @@
 
 Sistema académico alineado con el ODS 11 - Ciudades y Comunidades Sostenibles.
 
-## 🎯 Objetivo del Sprint 1 (MVP)
+## Objetivo del Sprint 1 (MVP)
 
 Sistema funcional que permite:
 - Registro y login de usuarios
@@ -10,7 +10,7 @@ Sistema funcional que permite:
 - Listar reportes
 - Cambiar estado de reportes (solo administradores)
 
-## 🛠️ Tecnologías
+## Tecnologías
 
 - **Backend**: Node.js + Express
 - **Base de datos**: MongoDB con Mongoose
@@ -18,7 +18,7 @@ Sistema funcional que permite:
 - **Frontend**: React (Vite)
 - **Arquitectura**: Cliente-Servidor
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 SIVU_Primera_Prueba/
@@ -63,7 +63,7 @@ SIVU_Primera_Prueba/
     └── vite.config.js
 ```
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### Prerrequisitos
 
@@ -150,7 +150,7 @@ Necesitas MongoDB corriendo en **localhost:27017** para que el backend guarde us
    ```
    (sustituye usuario, password y la parte del cluster por los tuyos).
 
-## 📝 Modelos de Datos
+##  Modelos de Datos
 
 ### Usuario
 - `_id`: ObjectId
@@ -173,7 +173,7 @@ Necesitas MongoDB corriendo en **localhost:27017** para que el backend guarde us
 - `createdAt`: Date
 - `updatedAt`: Date
 
-## 🔐 Roles y Permisos
+## Roles y Permisos
 
 ### Ciudadano
 - Puede crear reportes
@@ -198,7 +198,7 @@ Necesitas MongoDB corriendo en **localhost:27017** para que el backend guarde us
 - `GET /api/reportes/:id` - Obtener reporte por ID (requiere autenticación)
 - `PATCH /api/reportes/:id/estado` - Cambiar estado (requiere autenticación y rol admin)
 
-## 🎓 Explicación del Código
+## Explicación del Código
 
 ### Backend
 
@@ -235,7 +235,7 @@ Necesitas MongoDB corriendo en **localhost:27017** para que el backend guarde us
 - `authService.js`: Funciones para autenticación
 - `reporteService.js`: Funciones para gestión de reportes
 
-## 📚 Notas Académicas
+## Notas Académicas
 
 Este proyecto implementa:
 - Arquitectura cliente-servidor
@@ -247,7 +247,7 @@ Este proyecto implementa:
 - Validación de datos
 - Manejo de errores
 
-## 🔄 Próximos Pasos (Fuera del Sprint 1)
+## Próximos Pasos (Fuera del Sprint 1)
 
 - Subida de imágenes para reportes
 - Geolocalización en mapas
@@ -256,6 +256,6 @@ Este proyecto implementa:
 - Filtros y búsqueda avanzada
 - Comentarios en reportes
 
-## 📄 Licencia
+## Licencia
 
 Proyecto académico - Uso educativo
