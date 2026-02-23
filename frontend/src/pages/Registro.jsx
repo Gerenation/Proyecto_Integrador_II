@@ -54,7 +54,7 @@ const Registro = () => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>SIVU</h1>
+        <h1 style={styles.title}>SIVUR</h1>
         <h2 style={styles.subtitle}>Crear Cuenta</h2>
 
         {error && (

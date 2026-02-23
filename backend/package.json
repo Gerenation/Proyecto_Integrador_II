@@ -1,7 +1,7 @@
 {
-  "name": "sivu-backend",
+  "name": "sivur-backend",
   "version": "1.0.0",
-  "description": "Backend para SIVU - Sistema de Incidencias y Vigilancia Urbana",
+  "description": "Backend para SIVUR - Sistema de Incidencias y Vigilancia Urbana",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

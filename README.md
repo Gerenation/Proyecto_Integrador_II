@@ -1,6 +1,6 @@
-# SIVU - Sistema de Incidencias y Vigilancia Urbana
+## SIVUR - Sistema Integrado de Vigilancia Urbana y Responsabilidad Ambiental
 
-Sistema académico alineado con el ODS 11 - Ciudades y Comunidades Sostenibles.
+Sistema alineado con el ODS 12 - Ciudades y Comunidades Sostenibles.
 
 ## Objetivo del Sprint 1 (MVP)
 

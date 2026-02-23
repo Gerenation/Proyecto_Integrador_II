@@ -25,7 +25,7 @@ app.use('/api/reportes', reporteRoutes);
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.json({ 
-    mensaje: 'API de SIVU funcionando correctamente',
+    mensaje: 'API de SIVUR funcionando correctamente',
     version: '1.0.0'
   });
 });

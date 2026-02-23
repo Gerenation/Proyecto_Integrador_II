@@ -3,7 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "=== Instalador de MongoDB para SIVU ===" -ForegroundColor Cyan
+Write-Host "=== Instalador de MongoDB para SIVUR ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Comprobar si se ejecuta como administrador

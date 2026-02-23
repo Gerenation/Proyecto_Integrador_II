@@ -27,7 +27,7 @@ const Dashboard = () => {
       {/* Barra de navegación */}
       <nav style={styles.navbar}>
         <div style={styles.navContent}>
-          <h1 style={styles.logo}>SIVU</h1>
+          <h1 style={styles.logo}>SIVUR</h1>
           <div style={styles.userInfo}>
             <span style={styles.userName}>
               {usuario?.nombre} ({usuario?.rol})
