@@ -14,6 +14,7 @@ const Registro = () => {
   const [password, setPassword] = useState('');
   const [confirmarPassword, setConfirmarPassword] = useState('');
   const [error, setError] = useState('');
+  const [esAdmin, setEsAdmin] = useState(false);
   const [cargando, setCargando] = useState(false);
 
   const { registro } = useAuth();
@@ -40,7 +41,12 @@ const Registro = () => {
 
     setCargando(true);
 
-    const resultado = await registro({ nombre, email, password });
+    const resultado = await registro({ 
+      nombre, 
+      email, 
+      password,
+      rol: esAdmin ? 'admin' : 'ciudadano'
+    });
 
     if (resultado.exito) {
       navigate('/dashboard');
@@ -74,6 +80,21 @@ const Registro = () => {
               style={styles.input}
               placeholder="Tu nombre completo"
             />
+          </div>
+
+          <div style={styles.formGroupRow}>
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={esAdmin}
+                onChange={(e) => setEsAdmin(e.target.checked)}
+                style={styles.checkbox}
+              />
+              Registrarme como administrador
+            </label>
+            <p style={styles.helpText}>
+              Usa esta opción solo para crear cuentas de administrador.
+            </p>
           </div>
 
           <div style={styles.formGroup}>
@@ -167,6 +188,12 @@ const styles = {
   formGroup: {
     marginBottom: '20px'
   },
+  formGroupRow: {
+    marginBottom: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px'
+  },
   label: {
     display: 'block',
     marginBottom: '8px',
@@ -209,6 +236,22 @@ const styles = {
     color: '#3498db',
     textDecoration: 'none',
     fontWeight: '500'
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    color: '#2c3e50',
+    fontSize: '14px'
+  },
+  checkbox: {
+    width: '16px',
+    height: '16px'
+  },
+  helpText: {
+    fontSize: '12px',
+    color: '#7f8c8d',
+    margin: 0
   }
 };
 

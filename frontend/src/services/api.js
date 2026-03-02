@@ -6,8 +6,9 @@ import axios from 'axios';
  * Base URL: URL del backend
  * Headers: Configuración por defecto para enviar JSON
  */
-// Usar ruta relativa para que Vite proxy envíe las peticiones al backend (evita CORS)
-const API_URL = import.meta.env.DEV ? '/api' : 'http://localhost:5000/api';
+// Usar ruta relativa para que Vite proxy envíe las peticiones al backend en desarrollo (evita CORS)
+// En producción, apuntar explícitamente al puerto configurado en el backend (.env -> PORT=5001)
+const API_URL = import.meta.env.DEV ? '/api' : 'http://localhost:5001/api';
 
 const api = axios.create({
   baseURL: API_URL,

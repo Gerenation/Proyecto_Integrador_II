@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       if (!error.response) {
         return {
           exito: false,
-          error: 'No se pudo conectar con el servidor. ¿Está el backend en marcha en http://localhost:5000?'
+          error: 'No se pudo conectar con el servidor. ¿Está el backend en marcha?'
         };
       }
       const data = error.response.data;
