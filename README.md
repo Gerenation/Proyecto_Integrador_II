@@ -21,7 +21,7 @@ Sistema funcional que permite:
 ## Estructura del Proyecto
 
 ```
-SIVU_Primera_Prueba/
+SIVUR/
 ├── backend/
 │   ├── config/
 │   │   └── database.js          # Configuración de MongoDB
@@ -40,7 +40,7 @@ SIVU_Primera_Prueba/
 │   ├── package.json
 │   └── server.js                # Servidor Express
 │
-└── frontend/
+├── frontend/
     ├── src/
     │   ├── components/
     │   │   ├── FormularioReporte.jsx  # Formulario para crear reportes
@@ -61,6 +61,8 @@ SIVU_Primera_Prueba/
     ├── index.html
     ├── package.json
     └── vite.config.js
+├── run_project.bat          # Script para iniciar backend y frontend
+└── README.md
 ```
 
 ## Instalación y Configuración
@@ -69,6 +71,19 @@ SIVU_Primera_Prueba/
 
 - Node.js (v16 o superior)
 - **MongoDB** en el puerto 27017 (ver sección [MongoDB](#mongodb) más abajo)
+
+### Ejecución rápida (Windows)
+
+1. Asegúrate de tener MongoDB ejecutándose (local o Atlas, ver sección [MongoDB](#mongodb)).
+2. En Windows, ve a la carpeta raíz del proyecto `SIVUR` y ejecuta:
+   ```powershell
+   cd ruta\al\proyecto\SIVUR
+   .\run_project.bat
+   ```
+3. Se abrirán dos ventanas de consola: una para el backend y otra para el frontend.
+4. Cuando terminen de iniciar, abre en el navegador: `http://localhost:5173/`.
+
+Si prefieres levantar los servicios manualmente, puedes seguir los pasos de Backend y Frontend a continuación.
 
 ### Backend
 
@@ -118,7 +133,7 @@ npm install
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:3000`
+La aplicación estará disponible en `http://localhost:5173/`
 
 ### MongoDB
 
@@ -129,7 +144,7 @@ Necesitas MongoDB corriendo en **localhost:27017** para que el backend guarde us
 1. Abre **PowerShell como Administrador** (clic derecho en PowerShell → "Ejecutar como administrador").
 2. Navega al proyecto y ejecuta:
    ```powershell
-   cd "C:\Users\danie\Documents\Programas\SIVU_Primera_Prueba"
+   cd "RUTA\AL\PROYECTO\SIVUR"
    .\scripts\Instalar-MongoDB.ps1
    ```
 3. Si MongoDB ya está instalado pero no corre, en una terminal normal:
