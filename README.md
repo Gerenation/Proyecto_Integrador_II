@@ -65,7 +65,7 @@ SIVUR/
 └── README.md
 ```
 
-## Instalación y Configuración
+## Instalación y Configuración (Los pasos siguientes están automatizados gracias a run_project.bat)
 
 ### Prerrequisitos
 
