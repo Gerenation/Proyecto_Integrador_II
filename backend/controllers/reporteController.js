@@ -149,7 +149,7 @@ const obtenerReporte = async (req, res) => {
       });
     }
 
-    // Verificar permisos: ciudadanos solo pueden ver sus propios reportes
+    // Verificar permisos, eso significa que los ciudadanos solo pueden ver sus propios reportes
     if (req.usuario.rol === 'ciudadano' && reporte.usuarioId._id.toString() !== req.usuario._id.toString()) {
       return res.status(403).json({
         mensaje: 'No tienes permisos para ver este reporte'
