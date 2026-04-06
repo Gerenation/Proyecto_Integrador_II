@@ -16,6 +16,7 @@ const FormularioReporte = ({ onReporteCreado }) => {
     categoria: 'Otro',
     ubicacion: ''
   });
+  const [imagenDataUrl, setImagenDataUrl] = useState('');
   const [error, setError] = useState('');
   const [exito, setExito] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -33,6 +34,29 @@ const FormularioReporte = ({ onReporteCreado }) => {
   };
 
   /**
+   * Maneja el archivo de imagen para previsualizarlo en la UI.
+   * Este flujo es mock y desacoplado para integrarlo luego con backend/cloud storage.
+   */
+  const handleImagenChange = (e) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) {
+      setImagenDataUrl('');
+      return;
+    }
+
+    if (!selectedFile.type.startsWith('image/')) {
+      setError('Solo se permiten archivos de imagen');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImagenDataUrl(reader.result);
+    };
+    reader.readAsDataURL(selectedFile);
+  };
+
+  /**
    * Maneja el envío del formulario
    */
   const handleSubmit = async (e) => {
@@ -42,7 +66,16 @@ const FormularioReporte = ({ onReporteCreado }) => {
     setCargando(true);
 
     try {
-      await crearReporte(formData);
+      const response = await crearReporte(formData);
+      const reporteCreado = response?.reporte;
+
+      // Guardar imagen localmente en un mock para futura integración backend.
+      if (reporteCreado?._id && imagenDataUrl) {
+        const existingImageMap = JSON.parse(localStorage.getItem('reportImageMap') || '{}');
+        existingImageMap[reporteCreado._id] = imagenDataUrl;
+        localStorage.setItem('reportImageMap', JSON.stringify(existingImageMap));
+      }
+
       setExito('Reporte creado exitosamente');
       
       // Limpiar formulario
@@ -52,10 +85,11 @@ const FormularioReporte = ({ onReporteCreado }) => {
         categoria: 'Otro',
         ubicacion: ''
       });
+      setImagenDataUrl('');
 
       // Notificar al componente padre
       if (onReporteCreado) {
-        onReporteCreado();
+        onReporteCreado(reporteCreado?._id);
       }
     } catch (error) {
       setError(error.response?.data?.mensaje || 'Error al crear el reporte');
@@ -65,43 +99,44 @@ const FormularioReporte = ({ onReporteCreado }) => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Crear Nuevo Reporte</h2>
+    <section className="panel">
+      <h2>Crear nuevo reporte</h2>
+      <p className="helper-text">
+        Puedes adjuntar una imagen como evidencia. En este sprint se guarda de forma local (mock) para preparar la integración backend.
+      </p>
 
       {error && (
-        <div style={styles.error}>
+        <div className="feedback error">
           {error}
         </div>
       )}
 
       {exito && (
-        <div style={styles.exito}>
+        <div className="feedback success">
           {exito}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Título:</label>
+      <form onSubmit={handleSubmit} className="form-grid report-form-grid">
+        <div className="form-field">
+          <label>Título</label>
           <input
             type="text"
             name="titulo"
             value={formData.titulo}
             onChange={handleChange}
             required
-            style={styles.input}
             placeholder="Ej: Basura acumulada en la esquina"
           />
         </div>
 
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Categoría:</label>
+        <div className="form-field">
+          <label>Categoría</label>
           <select
             name="categoria"
             value={formData.categoria}
             onChange={handleChange}
             required
-            style={styles.select}
           >
             {categorias.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
@@ -109,125 +144,53 @@ const FormularioReporte = ({ onReporteCreado }) => {
           </select>
         </div>
 
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Ubicación:</label>
+        <div className="form-field report-field-wide">
+          <label>Ubicación</label>
           <input
             type="text"
             name="ubicacion"
             value={formData.ubicacion}
             onChange={handleChange}
             required
-            style={styles.input}
             placeholder="Ej: Calle Principal #123, Colonia Centro"
           />
         </div>
 
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Descripción:</label>
+        <div className="form-field report-field-wide">
+          <label>Descripción</label>
           <textarea
             name="descripcion"
             value={formData.descripcion}
             onChange={handleChange}
             required
-            style={styles.textarea}
             placeholder="Describe el problema en detalle..."
             rows="4"
           />
         </div>
 
+        <div className="form-field report-field-wide">
+          <label>Imagen del reporte (opcional)</label>
+          <input type="file" accept="image/*" onChange={handleImagenChange} />
+          <span className="helper-text">Soporta JPG, PNG, WEBP y otros formatos de imagen.</span>
+          {imagenDataUrl && (
+            <img
+              src={imagenDataUrl}
+              alt="Vista previa del reporte"
+              className="report-image"
+            />
+          )}
+        </div>
+
         <button
           type="submit"
           disabled={cargando}
-          style={styles.button}
+            className="dashboard-button primary report-submit"
         >
           {cargando ? 'Creando...' : 'Crear Reporte'}
         </button>
       </form>
-    </div>
+    </section>
   );
-};
-
-// Estilos inline
-const styles = {
-  container: {
-    backgroundColor: 'white',
-    padding: '30px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    marginBottom: '30px'
-  },
-  title: {
-    color: '#2c3e50',
-    marginBottom: '20px',
-    fontSize: '24px'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  formGroup: {
-    marginBottom: '20px'
-  },
-  label: {
-    display: 'block',
-    marginBottom: '8px',
-    color: '#2c3e50',
-    fontWeight: '500'
-  },
-  input: {
-    width: '100%',
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  },
-  select: {
-    width: '100%',
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '16px',
-    boxSizing: 'border-box',
-    backgroundColor: 'white'
-  },
-  textarea: {
-    width: '100%',
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '16px',
-    boxSizing: 'border-box',
-    fontFamily: 'inherit',
-    resize: 'vertical'
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    marginTop: '10px'
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '12px',
-    borderRadius: '4px',
-    marginBottom: '20px',
-    textAlign: 'center'
-  },
-  exito: {
-    backgroundColor: '#efe',
-    color: '#3c3',
-    padding: '12px',
-    borderRadius: '4px',
-    marginBottom: '20px',
-    textAlign: 'center'
-  }
 };
 
 export default FormularioReporte;

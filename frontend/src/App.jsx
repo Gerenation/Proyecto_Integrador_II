@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
@@ -18,53 +19,55 @@ import Dashboard from './pages/Dashboard';
  */
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Ruta pública: Login */}
-          <Route path="/login" element={<Login />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Ruta pública: Login */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Ruta pública: Registro */}
-          <Route path="/registro" element={<Registro />} />
+            {/* Ruta pública: Registro */}
+            <Route path="/registro" element={<Registro />} />
 
-          {/* Ruta protegida: Dashboard */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Ruta protegida: Dashboard */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Ruta por defecto: Redirige según autenticación */}
-          <Route
-            path="/"
-            element={
-              <Navigate
-                to={
-                  localStorage.getItem('token') ? '/dashboard' : '/login'
-                }
-                replace
-              />
-            }
-          />
+            {/* Ruta por defecto: Redirige según autenticación */}
+            <Route
+              path="/"
+              element={
+                <Navigate
+                  to={
+                    localStorage.getItem('token') ? '/dashboard' : '/login'
+                  }
+                  replace
+                />
+              }
+            />
 
-          {/* Ruta 404: Redirige al dashboard o login */}
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to={
-                  localStorage.getItem('token') ? '/dashboard' : '/login'
-                }
-                replace
-              />
-            }
-          />
-        </Routes>
-      </Router>
-    </AuthProvider>
+            {/* Ruta 404: Redirige al dashboard o login */}
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to={
+                    localStorage.getItem('token') ? '/dashboard' : '/login'
+                  }
+                  replace
+                />
+              }
+            />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

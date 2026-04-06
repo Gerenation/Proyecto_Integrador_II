@@ -58,77 +58,73 @@ const Registro = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>SIVUR</h1>
-        <h2 style={styles.subtitle}>Crear Cuenta</h2>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1 className="auth-title">SIVUR</h1>
+        <h2 className="auth-subtitle">Crear cuenta</h2>
 
         {error && (
-          <div style={styles.error}>
+          <div className="feedback error">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Nombre:</label>
+        <form onSubmit={handleSubmit} className="form-grid auth-form-grid">
+          <div className="form-field">
+            <label>Nombre</label>
             <input
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               required
-              style={styles.input}
               placeholder="Tu nombre completo"
             />
           </div>
 
-          <div style={styles.formGroupRow}>
-            <label style={styles.checkboxLabel}>
+          <div className="auth-role-option">
+            <label className="auth-checkbox-label">
               <input
                 type="checkbox"
                 checked={esAdmin}
                 onChange={(e) => setEsAdmin(e.target.checked)}
-                style={styles.checkbox}
+                className="auth-checkbox"
               />
               Registrarme como administrador
             </label>
-            <p style={styles.helpText}>
+            <p className="helper-text">
               Usa esta opción solo para crear cuentas de administrador.
             </p>
           </div>
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Email:</label>
+          <div className="form-field">
+            <label>Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={styles.input}
               placeholder="tu@email.com"
             />
           </div>
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Contraseña:</label>
+          <div className="form-field">
+            <label>Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={styles.input}
               placeholder="Mínimo 6 caracteres"
             />
           </div>
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Confirmar Contraseña:</label>
+          <div className="form-field">
+            <label>Confirmar contraseña</label>
             <input
               type="password"
               value={confirmarPassword}
               onChange={(e) => setConfirmarPassword(e.target.value)}
               required
-              style={styles.input}
               placeholder="Repite tu contraseña"
             />
           </div>
@@ -136,123 +132,18 @@ const Registro = () => {
           <button
             type="submit"
             disabled={cargando}
-            style={styles.button}
+            className="dashboard-button primary auth-submit"
           >
             {cargando ? 'Creando cuenta...' : 'Registrarse'}
           </button>
         </form>
 
-        <p style={styles.linkText}>
-          ¿Ya tienes cuenta? <Link to="/login" style={styles.link}>Inicia sesión aquí</Link>
+        <p className="auth-link-text">
+          ¿Ya tienes cuenta? <Link to="/login" className="auth-link">Inicia sesión aquí</Link>
         </p>
       </div>
     </div>
   );
-};
-
-// Estilos inline
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: '20px'
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    width: '100%',
-    maxWidth: '400px'
-  },
-  title: {
-    textAlign: 'center',
-    color: '#2c3e50',
-    marginBottom: '10px',
-    fontSize: '32px',
-    fontWeight: 'bold'
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: '#7f8c8d',
-    marginBottom: '30px',
-    fontSize: '20px'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  formGroup: {
-    marginBottom: '20px'
-  },
-  formGroupRow: {
-    marginBottom: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px'
-  },
-  label: {
-    display: 'block',
-    marginBottom: '8px',
-    color: '#2c3e50',
-    fontWeight: '500'
-  },
-  input: {
-    width: '100%',
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#27ae60',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    marginTop: '10px'
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '12px',
-    borderRadius: '4px',
-    marginBottom: '20px',
-    textAlign: 'center'
-  },
-  linkText: {
-    textAlign: 'center',
-    marginTop: '20px',
-    color: '#7f8c8d'
-  },
-  link: {
-    color: '#3498db',
-    textDecoration: 'none',
-    fontWeight: '500'
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    color: '#2c3e50',
-    fontSize: '14px'
-  },
-  checkbox: {
-    width: '16px',
-    height: '16px'
-  },
-  helpText: {
-    fontSize: '12px',
-    color: '#7f8c8d',
-    margin: 0
-  }
 };
 
 export default Registro;

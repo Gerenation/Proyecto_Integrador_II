@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import FormularioReporte from '../components/FormularioReporte';
 import ListaReportes from '../components/ListaReportes';
+import MainNavigation from '../components/MainNavigation';
+import ProfilePanel from '../components/ProfilePanel';
+import ChatbotPlaceholder from '../components/ChatbotPlaceholder';
 
 /**
  * Página Dashboard
@@ -12,7 +17,10 @@ import ListaReportes from '../components/ListaReportes';
  */
 const Dashboard = () => {
   const { usuario, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState('crear');
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   /**
    * Maneja el cierre de sesión
@@ -22,95 +30,62 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  const handleReporteCreado = () => {
+    setRefreshCounter((currentValue) => currentValue + 1);
+  };
+
+  const renderContent = () => {
+    if (activeSection === 'perfil') {
+      return <ProfilePanel usuario={usuario} />;
+    }
+
+    if (activeSection === 'chatbot') {
+      return <ChatbotPlaceholder />;
+    }
+
+    if (activeSection === 'atendidos') {
+      return <ListaReportes onlyAttended refreshTrigger={refreshCounter} />;
+    }
+
+    return (
+      <>
+        <FormularioReporte onReporteCreado={handleReporteCreado} />
+        <ListaReportes refreshTrigger={refreshCounter} />
+      </>
+    );
+  };
+
   return (
-    <div style={styles.container}>
-      {/* Barra de navegación */}
-      <nav style={styles.navbar}>
-        <div style={styles.navContent}>
-          <h1 style={styles.logo}>SIVUR</h1>
-          <div style={styles.userInfo}>
-            <span style={styles.userName}>
+    <div className="dashboard-layout">
+      <nav className="dashboard-nav">
+        <div className="dashboard-nav-content">
+          <h1 className="dashboard-brand">SIVUR</h1>
+          <MainNavigation activeSection={activeSection} onSectionChange={setActiveSection} />
+          <div className="dashboard-actions">
+            <span className="helper-text">
               {usuario?.nombre} ({usuario?.rol})
             </span>
-            <button onClick={handleLogout} style={styles.logoutButton}>
+            <button type="button" onClick={toggleTheme} className="dashboard-button primary">
+              {theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+            </button>
+            <button type="button" onClick={handleLogout} className="dashboard-button danger">
               Cerrar Sesión
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Contenido principal */}
-      <div style={styles.content}>
-        <div style={styles.welcome}>
+      <main className="dashboard-main">
+        <section className="panel">
           <h2>Bienvenido, {usuario?.nombre}</h2>
-          <p>Gestiona y reporta incidencias urbanas en tu comunidad</p>
-        </div>
-
-        {/* Formulario para crear reportes */}
-        <FormularioReporte onReporteCreado={() => {
-          // El componente ListaReportes se actualizará automáticamente
-          // cuando se cree un nuevo reporte gracias al callback
-        }} />
-
-        {/* Lista de reportes */}
-        <ListaReportes />
-      </div>
+          <p className="helper-text">
+            Gestiona incidencias urbanas con una navegación modular y preparada para escalar.
+          </p>
+        </section>
+        {renderContent()}
+      </main>
     </div>
   );
-};
-
-// Estilos inline
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5'
-  },
-  navbar: {
-    backgroundColor: '#2c3e50',
-    color: 'white',
-    padding: '15px 0',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-  },
-  navContent: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 20px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  logo: {
-    margin: 0,
-    fontSize: '28px',
-    fontWeight: 'bold'
-  },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px'
-  },
-  userName: {
-    fontSize: '16px'
-  },
-  logoutButton: {
-    padding: '8px 16px',
-    backgroundColor: '#e74c3c',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500'
-  },
-  content: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '30px 20px'
-  },
-  welcome: {
-    marginBottom: '30px',
-    textAlign: 'center'
-  }
 };
 
 export default Dashboard;
