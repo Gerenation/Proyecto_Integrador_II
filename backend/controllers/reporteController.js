@@ -116,7 +116,7 @@ const crearReporteConFallback = async (req, res) => {
       });
 
       await nuevoReporte.save();
-      await nuevoReporte.populate('usuarioId', 'nombre email');
+      await nuevoReporte.populate('usuarioId', 'nombre email direccion numeroIdentificacion tipoIdentificacion');
       notificarReporteCreado(nuevoReporte);
 
       return res.status(201).json({
@@ -190,7 +190,7 @@ const crearReporteConFallback = async (req, res) => {
     });
 
     await nuevoReporte.save();
-    await nuevoReporte.populate('usuarioId', 'nombre email');
+    await nuevoReporte.populate('usuarioId', 'nombre email direccion numeroIdentificacion tipoIdentificacion');
     notificarReporteCreado(nuevoReporte);
 
     return res.status(201).json({
@@ -272,7 +272,7 @@ const listarReportes = async (req, res) => {
     const query = and.length ? { $and: and } : {};
 
     const reportes = await Reporte.find(query)
-      .populate('usuarioId', 'nombre email')
+      .populate('usuarioId', 'nombre email direccion numeroIdentificacion tipoIdentificacion')
       .sort({ fecha: -1 });
 
     res.json({
@@ -316,7 +316,7 @@ const cambiarEstado = async (req, res) => {
     reporte.estado = estado;
     await reporte.save();
 
-    await reporte.populate('usuarioId', 'nombre email');
+    await reporte.populate('usuarioId', 'nombre email direccion numeroIdentificacion tipoIdentificacion');
 
     res.json({
       mensaje: 'Estado del reporte actualizado exitosamente',
@@ -335,7 +335,7 @@ const obtenerReporte = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const reporte = await Reporte.findById(id).populate('usuarioId', 'nombre email');
+    const reporte = await Reporte.findById(id).populate('usuarioId', 'nombre email direccion numeroIdentificacion tipoIdentificacion');
 
     if (!reporte) {
       return res.status(404).json({

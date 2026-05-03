@@ -15,6 +15,7 @@ const labelTipo = (v) => TIPOS_IDENTIFICACION.find((t) => t.value === v)?.label 
 export default function ProfilePanel({ usuario }) {
   const { refreshUsuario } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
+  const [nombre, setNombre] = useState(usuario?.nombre || '');
   const [direccion, setDireccion] = useState(usuario?.direccion || '');
   const [fotoPreview, setFotoPreview] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -38,8 +39,21 @@ export default function ProfilePanel({ usuario }) {
     e.preventDefault();
     setGuardando(true);
     try {
-      const payload = { direccion: direccion.trim() };
+      const payload = {};
+      if (nombre.trim() !== usuario?.nombre) {
+        payload.nombre = nombre.trim();
+      }
+      if (direccion.trim() !== usuario?.direccion) {
+        payload.direccion = direccion.trim();
+      }
       if (fotoPreview) payload.fotoPerfil = fotoPreview;
+      
+      if (Object.keys(payload).length === 0) {
+        toast.error('No hay cambios para guardar');
+        setGuardando(false);
+        return;
+      }
+
       const { usuario: u } = await actualizarPerfil(payload);
       if (u) {
         localStorage.setItem('usuario', JSON.stringify(u));
@@ -123,13 +137,14 @@ export default function ProfilePanel({ usuario }) {
           variant="outline"
           className="profile-edit-btn"
           onClick={() => {
+            setNombre(usuario?.nombre || '');
             setDireccion(usuario?.direccion || '');
             setFotoPreview('');
             setEditOpen(true);
           }}
         >
           <Pencil size={16} aria-hidden />
-          Editar dirección y foto
+          Editar perfil
         </Button>
       </div>
 
@@ -139,6 +154,13 @@ export default function ProfilePanel({ usuario }) {
             El tipo y número de documento no se pueden cambiar aquí. Contacta a un administrador si hay
             un error.
           </p>
+          <Input
+            label="Nombre"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            minLength={2}
+            required
+          />
           <Input
             label="Dirección"
             value={direccion}

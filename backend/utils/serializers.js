@@ -13,12 +13,13 @@ function usuarioPublico(doc) {
     direccion: u.direccion || '',
     tipoIdentificacion: u.tipoIdentificacion || 'CC',
     numeroIdentificacion: u.numeroIdentificacion || '',
-    fotoPerfilUrl: u.fotoPerfilFileId ? `/api/files/${u.fotoPerfilFileId}` : null
+    fotoPerfilUrl: u.fotoPerfilFileId ? `/api/files/${u.fotoPerfilFileId}/public` : null
   };
 }
 
 /**
  * Reporte con URL de imagen GridFS o legado base64 en `imagen`.
+ * Incluye datos del usuario reportante: nombre, email, dirección, documento.
  */
 function serializeReporte(doc) {
   if (!doc) return null;
@@ -28,6 +29,19 @@ function serializeReporte(doc) {
   } else if (r.imagen && typeof r.imagen === 'string' && r.imagen.startsWith('data:')) {
     r.imagenUrl = r.imagen;
   }
+  
+  // Serializar datos del usuario reportante
+  if (r.usuarioId && typeof r.usuarioId === 'object') {
+    r.usuarioInfo = {
+      id: r.usuarioId._id || r.usuarioId.id,
+      nombre: r.usuarioId.nombre,
+      email: r.usuarioId.email,
+      direccion: r.usuarioId.direccion || '',
+      tipoIdentificacion: r.usuarioId.tipoIdentificacion || 'CC',
+      numeroIdentificacion: r.usuarioId.numeroIdentificacion || ''
+    };
+  }
+  
   return r;
 }
 

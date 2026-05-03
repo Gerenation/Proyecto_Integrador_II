@@ -177,14 +177,22 @@ const obtenerPerfil = async (req, res) => {
 };
 
 /**
- * PATCH /api/auth/perfil — dirección y/o foto de perfil (base64).
+ * PATCH /api/auth/perfil — nombre, dirección y/o foto de perfil (base64).
  */
 const actualizarPerfil = async (req, res) => {
   try {
-    const { direccion, fotoPerfil } = req.body;
+    const { nombre, direccion, fotoPerfil } = req.body;
     const u = await Usuario.findById(req.usuario._id);
     if (!u) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    if (nombre !== undefined) {
+      const nombreLimpio = String(nombre).trim();
+      if (nombreLimpio.length < 2) {
+        return res.status(400).json({ mensaje: 'El nombre debe tener al menos 2 caracteres' });
+      }
+      u.nombre = nombreLimpio;
     }
 
     if (direccion !== undefined) {

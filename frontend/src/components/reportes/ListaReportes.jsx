@@ -40,6 +40,7 @@ const estadoColors = {
 function ReportCardInner({ reporte, usuario, onEstadoChange }) {
   const reportante = nombreReportante(reporte.usuarioId);
   const imgSrc = resolveMediaUrl(reporte.imagenUrl || reporte.imagen);
+  const usuarioInfo = reporte.usuarioInfo || {};
 
   return (
     <>
@@ -68,9 +69,24 @@ function ReportCardInner({ reporte, usuario, onEstadoChange }) {
         <p className="ui-hint">
           <strong>Fecha:</strong> {formatearFechaReporte(reporte.fecha)}
         </p>
-        {reportante ? (
+        {reportante || usuarioInfo.nombre ? (
           <p className="ui-hint">
-            <strong>Reportado por:</strong> {reportante}
+            <strong>Reportado por:</strong> {usuarioInfo.nombre || reportante}
+          </p>
+        ) : null}
+        {usuarioInfo.email ? (
+          <p className="ui-hint">
+            <strong>Correo:</strong> {usuarioInfo.email}
+          </p>
+        ) : null}
+        {usuarioInfo.numeroIdentificacion ? (
+          <p className="ui-hint">
+            <strong>Documento:</strong> {usuarioInfo.tipoIdentificacion} · {usuarioInfo.numeroIdentificacion}
+          </p>
+        ) : null}
+        {usuarioInfo.direccion ? (
+          <p className="ui-hint">
+            <strong>Dirección:</strong> {usuarioInfo.direccion}
           </p>
         ) : null}
       </div>

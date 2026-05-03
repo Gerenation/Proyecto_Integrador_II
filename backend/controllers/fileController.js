@@ -2,6 +2,40 @@ const { openDownloadStream, findFileDoc } = require('../services/gridfsStore');
 const Reporte = require('../models/Reporte');
 
 /**
+ * GET /api/files/:id/public — descarga pública de fotos de perfil (sin autenticación).
+ */
+const descargarArchivoPublico = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const doc = await findFileDoc(id);
+    if (!doc) {
+      return res.status(404).json({ mensaje: 'Archivo no encontrado' });
+    }
+
+    const meta = doc.metadata || {};
+
+    // Solo permitir acceso público a fotos de perfil
+    if (meta.tipo !== 'perfil') {
+      return res.status(403).json({ mensaje: 'Este archivo no es accesible públicamente' });
+    }
+
+    res.setHeader('Content-Type', doc.contentType || 'application/octet-stream');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+
+    const stream = openDownloadStream(id);
+    stream.on('error', () => {
+      if (!res.headersSent) res.status(404).end();
+    });
+    stream.pipe(res);
+  } catch (err) {
+    console.error('GridFS (público):', err);
+    if (!res.headersSent) {
+      res.status(500).json({ mensaje: 'Error al leer el archivo' });
+    }
+  }
+};
+
+/**
  * GET /api/files/:id — transmisión desde GridFS (reporte o foto de perfil).
  */
 const descargarArchivo = async (req, res) => {
@@ -52,4 +86,4 @@ const descargarArchivo = async (req, res) => {
   }
 };
 
-module.exports = { descargarArchivo };
+module.exports = { descargarArchivo, descargarArchivoPublico };
