@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { registrar, login, obtenerPerfil } = require('../controllers/authController');
+const {
+  registrar,
+  login,
+  obtenerPerfil,
+  actualizarPerfil
+} = require('../controllers/authController');
 const { autenticar } = require('../middleware/auth');
 
 /**
@@ -19,5 +24,6 @@ router.post('/login', login);
 
 // Ruta protegida: obtener perfil (requiere autenticación)
 router.get('/perfil', autenticar, obtenerPerfil);
+router.patch('/perfil', autenticar, actualizarPerfil);
 
 module.exports = router;

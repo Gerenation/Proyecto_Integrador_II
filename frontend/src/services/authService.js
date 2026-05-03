@@ -35,3 +35,11 @@ export const obtenerPerfil = async () => {
   const response = await api.get('/auth/perfil');
   return response.data;
 };
+
+/**
+ * @param {{ direccion?: string, fotoPerfil?: string }} datos
+ */
+export const actualizarPerfil = async (datos) => {
+  const response = await api.patch('/auth/perfil', datos);
+  return response.data;
+};

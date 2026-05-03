@@ -1,72 +1,283 @@
+const mongoose = require('mongoose');
 const Reporte = require('../models/Reporte');
+const Usuario = require('../models/Usuario');
+const {
+  generarReporteDesdeTexto,
+  InvalidReportError,
+  LlmParseError,
+  LlmServiceError
+} = require('../services/ollama');
+const { bufferFromImageInput } = require('../utils/imageBuffer');
+const { uploadBuffer } = require('../services/gridfsStore');
+const { serializeReporte, serializeReportes } = require('../utils/serializers');
+const { enviarConfirmacionReporte } = require('../services/emailService');
+
+function ajustarCamposParaGuardar(datos, mensajeOriginal) {
+  const msg = String(mensajeOriginal || '').trim();
+  let titulo = String(datos.titulo || '').trim().substring(0, 100);
+  if (titulo.length < 3) {
+    const primeraLineaNoVacia = msg.split(/\r?\n/).find((l) => l.trim());
+    titulo = (primeraLineaNoVacia || msg).trim().substring(0, 100);
+  }
+  if (titulo.length < 3) {
+    titulo = 'Reporte urbano';
+  }
+
+  let descripcion = String(datos.descripcion || '').trim().substring(0, 500);
+  if (descripcion.length < 10) {
+    descripcion = msg.substring(0, 500);
+  }
+  if (descripcion.length < 10) {
+    descripcion = 'Reporte registrado por el ciudadano (texto breve).';
+  }
+
+  const ubicacion = String(datos.ubicacion || '').trim() || 'No especificada';
+
+  return {
+    titulo,
+    descripcion,
+    categoria: datos.categoria,
+    ubicacion
+  };
+}
 
 /**
- * Controlador para crear un nuevo reporte
- * POST /api/reportes
- * Requiere autenticación
+ * Imagen → GridFS únicamente. Nunca se envía a la IA (solo `mensaje` va a Ollama).
  */
-const crearReporte = async (req, res) => {
-  try {
-    const { titulo, descripcion, categoria, ubicacion } = req.body;
+async function procesarImagenReporte(req, imagen) {
+  if (!imagen || typeof imagen !== 'string') {
+    return { imagenFileId: null };
+  }
+  const parsed = bufferFromImageInput(imagen);
+  const imagenFileId = await uploadBuffer(
+    parsed.buffer,
+    `reporte-${Date.now()}`,
+    parsed.contentType,
+    { tipo: 'reporte', creatorId: String(req.usuario._id) }
+  );
+  return { imagenFileId };
+}
 
-    // Validar campos requeridos
-    if (!titulo || !descripcion || !categoria || !ubicacion) {
-      return res.status(400).json({
-        mensaje: 'Por favor completa todos los campos requeridos'
+function notificarReporteCreado(docPoblado) {
+  const ser = serializeReporte(docPoblado);
+  const email = docPoblado.usuarioId?.email;
+  const nombre = docPoblado.usuarioId?.nombre;
+  if (!email) return;
+  setImmediate(() => {
+    enviarConfirmacionReporte({ to: email, nombre, reporte: ser }).catch((err) =>
+      console.warn('[email] confirmación reporte:', err.message)
+    );
+  });
+}
+
+const crearReporteConFallback = async (req, res) => {
+  try {
+    const categoriasPermitidas = Reporte.schema.path('categoria').enumValues;
+
+    if (req.body.modo === 'manual') {
+      const { titulo, descripcion, categoria, ubicacion, imagen } = req.body;
+
+      if (
+        titulo == null ||
+        descripcion == null ||
+        categoria == null ||
+        ubicacion == null
+      ) {
+        return res.status(400).json({
+          mensaje:
+            'Reporte manual: envía titulo, descripcion, categoria y ubicacion'
+        });
+      }
+
+      if (!categoriasPermitidas.includes(categoria)) {
+        return res.status(400).json({
+          mensaje: 'Categoría no válida para el reporte manual'
+        });
+      }
+
+      let imagenFileId = null;
+      if (imagen && typeof imagen === 'string') {
+        try {
+          const r = await procesarImagenReporte(req, imagen);
+          imagenFileId = r.imagenFileId;
+        } catch (imgErr) {
+          return res.status(400).json({ mensaje: imgErr.message });
+        }
+      }
+
+      const nuevoReporte = new Reporte({
+        titulo: String(titulo).trim().substring(0, 100),
+        descripcion: String(descripcion).trim().substring(0, 500),
+        categoria,
+        ubicacion: String(ubicacion).trim(),
+        imagen: null,
+        imagenFileId,
+        usuarioId: req.usuario._id
+      });
+
+      await nuevoReporte.save();
+      await nuevoReporte.populate('usuarioId', 'nombre email');
+      notificarReporteCreado(nuevoReporte);
+
+      return res.status(201).json({
+        mensaje: 'Reporte manual creado correctamente',
+        reporte: serializeReporte(nuevoReporte),
+        iaDisponible: false
       });
     }
 
-    // Crear nuevo reporte asociado al usuario autenticado
+    const { mensaje, imagen } = req.body;
+
+    if (!mensaje || typeof mensaje !== 'string' || !mensaje.trim()) {
+      return res.status(400).json({
+        mensaje: 'Debes enviar un campo "mensaje" con el texto del reporte'
+      });
+    }
+
+    let imagenFileId = null;
+    if (imagen && typeof imagen === 'string') {
+      try {
+        const r = await procesarImagenReporte(req, imagen);
+        imagenFileId = r.imagenFileId;
+      } catch (imgErr) {
+        return res.status(400).json({ mensaje: imgErr.message });
+      }
+    }
+
+    let datos;
+    let usadoIA = true;
+
+    try {
+      datos = await generarReporteDesdeTexto(mensaje);
+    } catch (errIa) {
+      if (errIa instanceof LlmServiceError) {
+        console.warn('⚠️  Ollama no disponible, usando fallback:', errIa.message);
+        usadoIA = false;
+        const lineas = mensaje.trim().split('\n');
+        datos = {
+          titulo: lineas[0].substring(0, 100) || 'Reporte sin título',
+          descripcion: mensaje.substring(0, 500),
+          categoria: 'Otro',
+          ubicacion: 'No especificada'
+        };
+      } else if (errIa instanceof InvalidReportError) {
+        return res.status(400).json({ mensaje: errIa.message });
+      } else if (errIa instanceof LlmParseError) {
+        console.warn('⚠️  Respuesta de IA no parseable, usando fallback:', errIa.message);
+        usadoIA = false;
+        const lineas = mensaje.trim().split('\n');
+        datos = {
+          titulo: lineas[0].substring(0, 100) || 'Reporte sin título',
+          descripcion: mensaje.substring(0, 500),
+          categoria: 'Otro',
+          ubicacion: 'No especificada'
+        };
+      } else {
+        throw errIa;
+      }
+    }
+
+    datos = ajustarCamposParaGuardar(datos, mensaje);
+
     const nuevoReporte = new Reporte({
-      titulo,
-      descripcion,
-      categoria,
-      ubicacion,
-      usuarioId: req.usuario._id // El usuario viene del middleware de autenticación
+      titulo: datos.titulo,
+      descripcion: datos.descripcion,
+      categoria: datos.categoria,
+      ubicacion: datos.ubicacion,
+      imagen: null,
+      imagenFileId,
+      usuarioId: req.usuario._id
     });
 
     await nuevoReporte.save();
-
-    // Poblar el campo usuarioId para devolver información del usuario
     await nuevoReporte.populate('usuarioId', 'nombre email');
+    notificarReporteCreado(nuevoReporte);
 
-    res.status(201).json({
-      mensaje: 'Reporte creado exitosamente',
-      reporte: nuevoReporte
+    return res.status(201).json({
+      mensaje: usadoIA ? 'Reporte creado con IA' : 'Reporte creado sin IA (fallback)',
+      reporte: serializeReporte(nuevoReporte),
+      iaDisponible: usadoIA
     });
   } catch (error) {
-    console.error('Error al crear reporte:', error);
-    res.status(500).json({
+    console.error('❌ Error al crear reporte:', error);
+
+    if (error.name === 'ValidationError') {
+      const primerError = Object.values(error.errors)[0];
+      const texto = primerError ? primerError.message : 'Datos del reporte inválidos';
+      return res.status(400).json({ mensaje: texto });
+    }
+
+    return res.status(500).json({
       mensaje: 'Error al crear reporte',
       error: error.message
     });
   }
 };
 
-/**
- * Controlador para listar todos los reportes
- * GET /api/reportes
- * Requiere autenticación
- * Los ciudadanos ven solo sus reportes, los admins ven todos
- */
+const crearReporte = crearReporteConFallback;
+
 const listarReportes = async (req, res) => {
   try {
-    let query = {};
+    const { q, estado, usuarioId: uidFiltro, desde, hasta, nombreUsuario } = req.query;
+    const estadosValidos = Reporte.schema.path('estado').enumValues;
+    const and = [];
 
-    // Si es ciudadano, solo ver sus propios reportes
-    // Si es admin, ver todos los reportes
     if (req.usuario.rol === 'ciudadano') {
-      query.usuarioId = req.usuario._id;
+      and.push({ usuarioId: req.usuario._id });
     }
 
-    // Buscar reportes y poblar información del usuario
+    if (estado && estadosValidos.includes(estado)) {
+      and.push({ estado });
+    }
+
+    if (req.usuario.rol === 'admin' && uidFiltro && mongoose.isValidObjectId(uidFiltro)) {
+      and.push({ usuarioId: uidFiltro });
+    }
+
+    if (desde || hasta) {
+      const rango = {};
+      if (desde) {
+        const d = new Date(desde);
+        if (!Number.isNaN(d.getTime())) rango.$gte = d;
+      }
+      if (hasta) {
+        const h = new Date(hasta);
+        if (!Number.isNaN(h.getTime())) {
+          h.setHours(23, 59, 59, 999);
+          rango.$lte = h;
+        }
+      }
+      if (Object.keys(rango).length) {
+        and.push({ fecha: rango });
+      }
+    }
+
+    if (q && String(q).trim()) {
+      const esc = String(q).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const rx = new RegExp(esc, 'i');
+      and.push({ $or: [{ titulo: rx }, { descripcion: rx }] });
+    }
+
+    if (nombreUsuario && String(nombreUsuario).trim() && req.usuario.rol === 'admin') {
+      const esc = String(nombreUsuario).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const rx = new RegExp(esc, 'i');
+      const usuarios = await Usuario.find({ nombre: rx }).select('_id');
+      const ids = usuarios.map((u) => u._id);
+      if (!ids.length) {
+        return res.json({ cantidad: 0, reportes: [] });
+      }
+      and.push({ usuarioId: { $in: ids } });
+    }
+
+    const query = and.length ? { $and: and } : {};
+
     const reportes = await Reporte.find(query)
       .populate('usuarioId', 'nombre email')
-      .sort({ fecha: -1 }); // Ordenar por fecha más reciente primero
+      .sort({ fecha: -1 });
 
     res.json({
       cantidad: reportes.length,
-      reportes
+      reportes: serializeReportes(reportes)
     });
   } catch (error) {
     console.error('Error al listar reportes:', error);
@@ -77,18 +288,11 @@ const listarReportes = async (req, res) => {
   }
 };
 
-/**
- * Controlador para cambiar el estado de un reporte
- * PATCH /api/reportes/:id/estado
- * Requiere autenticación
- * Solo los admins pueden cambiar el estado
- */
 const cambiarEstado = async (req, res) => {
   try {
     const { id } = req.params;
     const { estado } = req.body;
 
-    // Validar que el estado sea válido
     const estadosValidos = ['Pendiente', 'En proceso', 'Resuelto'];
     if (!estado || !estadosValidos.includes(estado)) {
       return res.status(400).json({
@@ -96,7 +300,6 @@ const cambiarEstado = async (req, res) => {
       });
     }
 
-    // Buscar el reporte
     const reporte = await Reporte.findById(id);
     if (!reporte) {
       return res.status(404).json({
@@ -104,24 +307,20 @@ const cambiarEstado = async (req, res) => {
       });
     }
 
-    // Verificar permisos: ciudadanos solo pueden cambiar estado de sus propios reportes
-    // En este MVP, solo los admins pueden cambiar estados
     if (req.usuario.rol !== 'admin') {
       return res.status(403).json({
         mensaje: 'No tienes permisos para cambiar el estado de este reporte'
       });
     }
 
-    // Actualizar el estado
     reporte.estado = estado;
     await reporte.save();
 
-    // Poblar información del usuario
     await reporte.populate('usuarioId', 'nombre email');
 
     res.json({
       mensaje: 'Estado del reporte actualizado exitosamente',
-      reporte
+      reporte: serializeReporte(reporte)
     });
   } catch (error) {
     console.error('Error al cambiar estado:', error);
@@ -132,11 +331,6 @@ const cambiarEstado = async (req, res) => {
   }
 };
 
-/**
- * Controlador para obtener un reporte por ID
- * GET /api/reportes/:id
- * Requiere autenticación
- */
 const obtenerReporte = async (req, res) => {
   try {
     const { id } = req.params;
@@ -149,15 +343,18 @@ const obtenerReporte = async (req, res) => {
       });
     }
 
-    // Verificar permisos, eso significa que los ciudadanos solo pueden ver sus propios reportes
-    if (req.usuario.rol === 'ciudadano' && reporte.usuarioId._id.toString() !== req.usuario._id.toString()) {
+    const duenoReporteId = reporte.usuarioId?._id ?? reporte.usuarioId;
+    if (
+      req.usuario.rol === 'ciudadano' &&
+      (!duenoReporteId || duenoReporteId.toString() !== req.usuario._id.toString())
+    ) {
       return res.status(403).json({
         mensaje: 'No tienes permisos para ver este reporte'
       });
     }
 
     res.json({
-      reporte
+      reporte: serializeReporte(reporte)
     });
   } catch (error) {
     console.error('Error al obtener reporte:', error);

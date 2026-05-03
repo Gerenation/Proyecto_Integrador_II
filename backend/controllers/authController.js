@@ -1,31 +1,50 @@
 const Usuario = require('../models/Usuario');
 const jwt = require('jsonwebtoken');
+const { usuarioPublico } = require('../utils/serializers');
+const { bufferFromImageInput } = require('../utils/imageBuffer');
+const { uploadBuffer, deleteFile } = require('../services/gridfsStore');
 
-/**
- * Genera un token JWT para el usuario
- */
 const generarToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d' // El token expira en 30 días
+    expiresIn: '30d'
   });
 };
 
-/**
- * Controlador para registrar un nuevo usuario
- * POST /api/auth/registro
- */
+const TIPOS_ID = ['CC', 'Pasaporte', 'Extranjeria'];
+
 const registrar = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const {
+      nombre,
+      email,
+      password,
+      rol,
+      direccion,
+      tipoIdentificacion,
+      numeroIdentificacion,
+      fotoPerfil
+    } = req.body;
 
-    // Validar que todos los campos requeridos estén presentes
     if (!nombre || !email || !password) {
       return res.status(400).json({
-        mensaje: 'Por favor completa todos los campos requeridos'
+        mensaje: 'Por favor completa nombre, email y contraseña'
       });
     }
 
-    // Verificar si el usuario ya existe
+    if (!direccion || !String(direccion).trim()) {
+      return res.status(400).json({ mensaje: 'La dirección es obligatoria' });
+    }
+    if (!tipoIdentificacion || !TIPOS_ID.includes(tipoIdentificacion)) {
+      return res.status(400).json({
+        mensaje: 'Tipo de identificación inválido (CC, Pasaporte o Extranjeria)'
+      });
+    }
+    if (!numeroIdentificacion || String(numeroIdentificacion).trim().length < 5) {
+      return res.status(400).json({
+        mensaje: 'El número de identificación debe tener al menos 5 caracteres'
+      });
+    }
+
     const usuarioExiste = await Usuario.findOne({ email });
     if (usuarioExiste) {
       return res.status(400).json({
@@ -33,44 +52,62 @@ const registrar = async (req, res) => {
       });
     }
 
-    // Crear nuevo usuario
-    // Solo permitir rol 'admin' si se especifica explícitamente (en producción debería ser más restrictivo)
+    const dupDoc = await Usuario.findOne({
+      numeroIdentificacion: String(numeroIdentificacion).trim()
+    });
+    if (dupDoc) {
+      return res.status(400).json({
+        mensaje: 'El número de identificación ya está registrado'
+      });
+    }
+
     const nuevoUsuario = new Usuario({
       nombre,
       email,
       password,
-      rol: rol || 'ciudadano'
+      rol: rol || 'ciudadano',
+      direccion: String(direccion).trim(),
+      tipoIdentificacion,
+      numeroIdentificacion: String(numeroIdentificacion).trim()
     });
 
     await nuevoUsuario.save();
 
-    // Generar token y enviar respuesta
+    if (fotoPerfil && typeof fotoPerfil === 'string') {
+      try {
+        const parsed = bufferFromImageInput(fotoPerfil);
+        nuevoUsuario.fotoPerfilFileId = await uploadBuffer(
+          parsed.buffer,
+          `perfil-${nuevoUsuario._id}-${Date.now()}`,
+          parsed.contentType,
+          { tipo: 'perfil', userId: String(nuevoUsuario._id) }
+        );
+        await nuevoUsuario.save();
+      } catch (imgErr) {
+        console.warn('Registro: foto de perfil omitida:', imgErr.message);
+      }
+    }
+
     const token = generarToken(nuevoUsuario._id);
+    const fresh = await Usuario.findById(nuevoUsuario._id).select('-password');
 
     res.status(201).json({
       mensaje: 'Usuario registrado exitosamente',
       token,
-      usuario: {
-        id: nuevoUsuario._id,
-        nombre: nuevoUsuario.nombre,
-        email: nuevoUsuario.email,
-        rol: nuevoUsuario.rol
-      }
+      usuario: usuarioPublico(fresh)
     });
   } catch (error) {
     console.error('Error en registro:', error);
 
-    // Errores de validación de Mongoose (ej: email duplicado, formato inválido)
     if (error.name === 'ValidationError') {
       const primerError = Object.values(error.errors)[0];
       const mensaje = primerError ? primerError.message : 'Datos inválidos';
       return res.status(400).json({ mensaje });
     }
 
-    // Error de índice único (email duplicado)
     if (error.code === 11000) {
       return res.status(400).json({
-        mensaje: 'El email ya está registrado'
+        mensaje: 'Email o número de identificación ya registrado'
       });
     }
 
@@ -81,22 +118,16 @@ const registrar = async (req, res) => {
   }
 };
 
-/**
- * Controlador para iniciar sesión
- * POST /api/auth/login
- */
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validar campos
     if (!email || !password) {
       return res.status(400).json({
         mensaje: 'Por favor ingresa email y contraseña'
       });
     }
 
-    // Buscar usuario por email
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
       return res.status(401).json({
@@ -104,7 +135,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Verificar contraseña
     const passwordValida = await usuario.compararPassword(password);
     if (!passwordValida) {
       return res.status(401).json({
@@ -112,18 +142,12 @@ const login = async (req, res) => {
       });
     }
 
-    // Generar token y enviar respuesta
     const token = generarToken(usuario._id);
 
     res.json({
       mensaje: 'Login exitoso',
       token,
-      usuario: {
-        id: usuario._id,
-        nombre: usuario.nombre,
-        email: usuario.email,
-        rol: usuario.rol
-      }
+      usuario: usuarioPublico(usuario)
     });
   } catch (error) {
     console.error('Error en login:', error);
@@ -134,21 +158,14 @@ const login = async (req, res) => {
   }
 };
 
-/**
- * Controlador para obtener el perfil del usuario autenticado
- * GET /api/auth/perfil
- * Requiere autenticación
- */
 const obtenerPerfil = async (req, res) => {
   try {
-    // El usuario ya está disponible en req.usuario gracias al middleware de autenticación
+    const u = await Usuario.findById(req.usuario._id).select('-password');
+    if (!u) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
     res.json({
-      usuario: {
-        id: req.usuario._id,
-        nombre: req.usuario.nombre,
-        email: req.usuario.email,
-        rol: req.usuario.rol
-      }
+      usuario: usuarioPublico(u)
     });
   } catch (error) {
     console.error('Error al obtener perfil:', error);
@@ -159,8 +176,63 @@ const obtenerPerfil = async (req, res) => {
   }
 };
 
+/**
+ * PATCH /api/auth/perfil — dirección y/o foto de perfil (base64).
+ */
+const actualizarPerfil = async (req, res) => {
+  try {
+    const { direccion, fotoPerfil } = req.body;
+    const u = await Usuario.findById(req.usuario._id);
+    if (!u) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    if (direccion !== undefined) {
+      u.direccion = String(direccion).trim();
+      if (!u.direccion) {
+        return res.status(400).json({ mensaje: 'La dirección no puede quedar vacía' });
+      }
+    }
+
+    if (fotoPerfil && typeof fotoPerfil === 'string') {
+      const parsed = bufferFromImageInput(fotoPerfil);
+      if (u.fotoPerfilFileId) {
+        await deleteFile(u.fotoPerfilFileId);
+      }
+      u.fotoPerfilFileId = await uploadBuffer(
+        parsed.buffer,
+        `perfil-${u._id}-${Date.now()}`,
+        parsed.contentType,
+        { tipo: 'perfil', userId: String(u._id) }
+      );
+    }
+
+    await u.save();
+    const fresh = await Usuario.findById(u._id).select('-password');
+    res.json({
+      mensaje: 'Perfil actualizado',
+      usuario: usuarioPublico(fresh)
+    });
+  } catch (error) {
+    console.error('actualizarPerfil:', error);
+    if (
+      error.message &&
+      (error.message.includes('grande') ||
+        error.message.includes('inválido') ||
+        error.message.includes('vacía'))
+    ) {
+      return res.status(400).json({ mensaje: error.message });
+    }
+    res.status(500).json({
+      mensaje: 'Error al actualizar perfil',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   registrar,
   login,
-  obtenerPerfil
+  obtenerPerfil,
+  actualizarPerfil
 };

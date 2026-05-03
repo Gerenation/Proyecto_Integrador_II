@@ -1,10 +1,12 @@
 import axios from 'axios';
 
 /**
- * Configuración de Axios para las peticiones HTTP
- * 
- * Base URL: URL del backend
- * Headers: Configuración por defecto para enviar JSON
+ * Cliente HTTP compartido (Axios) para todo el frontend.
+ *
+ * - En desarrollo, baseURL `/api` para que el proxy de Vite reenvíe al backend (evita CORS).
+ * - En build de producción, apunta a la URL absoluta del API (mismo host que configure el despliegue).
+ * - Request: adjunta Authorization Bearer si hay token en localStorage.
+ * - Response: ante 401 limpia sesión y redirige a /login.
  */
 // Usar ruta relativa para que Vite proxy envíe las peticiones al backend en desarrollo (evita CORS)
 // En producción, apuntar explícitamente al puerto configurado en el backend (.env -> PORT=5001)

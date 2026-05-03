@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
+/**
+ * Tema visual global (claro / oscuro).
+ *
+ * - Persiste la elección en localStorage bajo la clave `theme`.
+ * - Aplica `data-theme="light"|"dark"` en <html> para que los estilos en app.css reaccionen.
+ */
 const ThemeContext = createContext();
 
 export const useTheme = () => {

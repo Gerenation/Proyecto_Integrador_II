@@ -1,11 +1,13 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { loginUsuario, registrarUsuario } from '../services/authService';
+import { loginUsuario, registrarUsuario, obtenerPerfil } from '../services/authService';
 
 /**
- * Contexto de autenticación
- * 
- * Proporciona el estado de autenticación y funciones de login/registro
- * a todos los componentes de la aplicación mediante React Context
+ * Sesión de usuario (JWT + datos mínimos del perfil).
+ *
+ * Responsabilidades:
+ * - Restaurar sesión desde localStorage al cargar la app (token + usuario serializado).
+ * - Exponer login / registro / logout y banderas `cargando`, `estaAutenticado`.
+ * - Los servicios HTTP añaden el Bearer token vía `services/api.js`.
  */
 const AuthContext = createContext();
 
@@ -41,19 +43,48 @@ export const AuthProvider = ({ children }) => {
    * Verifica si hay un token guardado y restaura la sesión
    */
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const usuarioGuardado = localStorage.getItem('usuario');
+    let cancelled = false;
 
-    if (token && usuarioGuardado) {
+    async function restaurarSesion() {
+      const token = localStorage.getItem('token');
+      const usuarioGuardado = localStorage.getItem('usuario');
+
+      if (!token) {
+        if (!cancelled) setCargando(false);
+        return;
+      }
+
+      if (usuarioGuardado) {
+        try {
+          setUsuario(JSON.parse(usuarioGuardado));
+        } catch (error) {
+          console.error('Error al parsear usuario guardado:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('usuario');
+          if (!cancelled) setCargando(false);
+          return;
+        }
+      }
+
       try {
-        setUsuario(JSON.parse(usuarioGuardado));
-      } catch (error) {
-        console.error('Error al parsear usuario guardado:', error);
+        const { usuario: u } = await obtenerPerfil();
+        if (!cancelled && u) {
+          setUsuario(u);
+          localStorage.setItem('usuario', JSON.stringify(u));
+        }
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
+        if (!cancelled) setUsuario(null);
+      } finally {
+        if (!cancelled) setCargando(false);
       }
     }
-    setCargando(false);
+
+    restaurarSesion();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   /**
@@ -126,12 +157,27 @@ export const AuthProvider = ({ children }) => {
     setUsuario(null);
   };
 
-  // Valores que se proporcionan a través del contexto
+  /**
+   * Sincroniza usuario con GET /auth/perfil (tras editar perfil o datos nuevos en servidor).
+   */
+  const refreshUsuario = async () => {
+    try {
+      const { usuario: u } = await obtenerPerfil();
+      if (u) {
+        setUsuario(u);
+        localStorage.setItem('usuario', JSON.stringify(u));
+      }
+    } catch (e) {
+      console.error('refreshUsuario:', e);
+    }
+  };
+
   const valor = {
     usuario,
     login,
     registro,
     logout,
+    refreshUsuario,
     cargando,
     estaAutenticado: !!usuario
   };
