@@ -1,21 +1,21 @@
 # SIVUR - Sistema Integrado de Vigilancia Urbana y Responsabilidad Ambiental
 
-**Plataforma web colaborativa con IA local para reporte y seguimiento de incidencias urbanas.** 🚀
+**Plataforma web colaborativa con IA local para reporte y seguimiento de incidencias urbanas.** 
 
 Ciudadanos pueden reportar problemas urbanos (basura, baches, alumbrado, ruido, inseguridad, contaminación) utilizando **3 modos innovadores:**
 1. **Modo Manual** - Formulario tradicional  
-2. **Modo IA (Ollama + Llama 3)** - Texto libre procesado automáticamente 🧠
-3. **Modo Voz** - Dictado en español con Web Speech API 🎤
+2. **Modo IA (Ollama + Llama 3)** - Texto libre procesado automáticamente 
+3. **Modo Voz** - Dictado en español con Web Speech API 
 
 Administradores gestionan y dan seguimiento a reportes con datos completos del reportante. Sprint 3 completo con gestión avanzada de perfiles e integración de IA local.
 
-**Versión actual:** Sprint 3 ✅  
+**Versión actual:** Sprint 3   
 **Stack:** React 18 + Vite | Express.js | MongoDB + GridFS | JWT | Ollama (Llama 3) | Nodemailer  
-**Estado:** MVP funcional - Producción-ready (pruebas de aceptación) 🎉
+**Estado:** MVP funcional - Producción-ready (pruebas de aceptación) 
 
 ---
 
-## 📋 Tabla de Contenidos
+##  Tabla de Contenidos
 
 - [Demo local](#demo-local-del-proyecto)
 - [Objetivos por Sprint](#objetivos-por-sprint)
@@ -35,7 +35,7 @@ Administradores gestionan y dan seguimiento a reportes con datos completos del r
 
 ---
 
-## 🌐 Demo local del proyecto
+##  Demo local del proyecto
 
 - **Frontend (Vite + React):** `http://localhost:5173`
 - **Backend (Express):** `http://localhost:5001`
@@ -43,42 +43,42 @@ Administradores gestionan y dan seguimiento a reportes con datos completos del r
 - **Ollama (opcional):** `http://localhost:11434`
 
 **Características principales disponibles:**
-- ✅ Registro/Login con JWT
-- ✅ Crear reportes en **3 modos** (manual, IA con Llama 3, voz)
-- ✅ Editar perfil (nombre, dirección, foto)
-- ✅ Cambiar estado de reportes (admin)
-- ✅ Ver información completa del reportante
-- ✅ Tema claro/oscuro
-- ✅ Notificaciones por email
+-  Registro/Login con JWT
+-  Crear reportes en **3 modos** (manual, IA con Llama 3, voz)
+-  Editar perfil (nombre, dirección, foto)
+-  Cambiar estado de reportes (admin)
+-  Ver información completa del reportante
+-  Tema claro/oscuro
+-  Notificaciones por email
 
 ---
 
-## 🆕 Qué hay de nuevo en Sprint 3
+##  Qué hay de nuevo en Sprint 3
 
-### ⭐ Modos de Creación de Reportes (Innovador)
+###  Modos de Creación de Reportes (Innovador)
 - **Modo Manual:** Formulario tradicional con validación
-- **Modo IA (Ollama):** Procesa texto libre con Llama 3 local 🧠
+- **Modo IA (Ollama):** Procesa texto libre con Llama 3 local 
   - Extrae automáticamente: título, descripción, categoría, ubicación
   - Las imágenes **NUNCA** se envían a IA (privacidad garantizada)
   - Fallback automático si Ollama no disponible
-- **Modo Voz:** Dictado en español con Web Speech API 🎤
+- **Modo Voz:** Dictado en español con Web Speech API 
   - Texto → procesamiento igual a Modo IA
   - Editable antes de enviar
 
-### 📝 Gestión Avanzada de Perfiles
+###  Gestión Avanzada de Perfiles
 - Editar nombre (antes solo dirección)
 - Subir/cambiar foto de perfil
 - Fotos cargadas correctamente desde GridFS
 - Ruta pública: `/api/files/:id/public` (sin autenticación)
 
-### 👤 Información Completa del Reportante
+###  Información Completa del Reportante
 En cada reporte ahora se muestra:
 - Nombre, email, dirección
 - Tipo y número de identificación
 - Foto de perfil del reportante
 - Disponible en API completo
 
-### 🎨 Mejoras UX
+###  Mejoras UX
 - Tema claro/oscuro persistente
 - Animaciones suaves (Framer Motion)
 - Indicadores de carga
@@ -87,11 +87,11 @@ En cada reporte ahora se muestra:
 
 ---
 
-## 🎯 Objetivos por Sprint
+##  Objetivos por Sprint
 
-### Sprint 1 ✅ (MVP Inicial)
+### Sprint 1  (MVP Inicial)
 
-✅ **Completado:**
+ **Completado:**
 - Registro e inicio de sesión de usuarios
 - Roles `ciudadano` y `admin`
 - Creación y listado de reportes
@@ -99,18 +99,18 @@ En cada reporte ahora se muestra:
 - UI moderna, responsive y consistente
 - Estructura lista para futuras integraciones
 
-### Sprint 2 ✅ (Mejoras de Seguridad y Almacenamiento)
+### Sprint 2  (Mejoras de Seguridad y Almacenamiento)
 
-✅ **Completado:**
+ **Completado:**
 - GridFS para almacenamiento de imágenes en MongoDB
 - Fotos de perfil con carga de archivos
 - Imágenes en reportes
 - Notificaciones por correo (Nodemailer)
 - **Integración con Ollama para procesamiento de texto con IA local (Llama 3)**
 
-### Sprint 3 ⭐ (Gestión de Perfiles y IA Avanzada) **← VERSIÓN ACTUAL**
+### Sprint 3  (Gestión de Perfiles y IA Avanzada) **← VERSIÓN ACTUAL**
 
-✅ **Completado:**
+ **Completado:**
 - **Edición de nombre de usuario** (antes solo dirección)
 - **Cargar y editar fotos de perfil correctamente**
 - **Ruta pública para fotos** (`/api/files/:id/public`) sin autenticación
@@ -135,19 +135,19 @@ En cada reporte ahora se muestra:
 
 ---
 
-## ✨ Funcionalidades implementadas
+##  Funcionalidades implementadas
 
-### 🤖 Modos de Creación de Reportes (Sprint 3)
+###  Modos de Creación de Reportes (Sprint 3)
 
 SIVUR ofrece **3 modos innovadores** para crear reportes:
 
-#### Modo 1️⃣ - Manual (Tradicional)
+#### Modo 1 - Manual (Tradicional)
 - Llenar formulario completo: **título, descripción, categoría, ubicación**
 - Subir foto opcional (JPEG, PNG, GIF, WebP)
 - Validación de campos mínimos
 - Ideal para reportes detallados
 
-#### Modo 2️⃣ - IA Inteligente (Ollama + Llama 3) 🆕
+#### Modo 2️ - IA Inteligente (Ollama + Llama 3) 
 - Escribir **texto libre/natural:** "Hay un hueco grande en la calle 5, es peligroso"
 - **Backend invoca Ollama locally** (Llama 3 por defecto)
 - IA **extrae automáticamente:**
@@ -155,21 +155,21 @@ SIVUR ofrece **3 modos innovadores** para crear reportes:
   - **Descripción** → "Hay un hueco grande que es peligroso"
   - **Categoría** → "Hueco" (de 8 opciones)
   - **Ubicación** → "Calle 5" (o ubicación más específica)
-- ✅ **Las imágenes NUNCA se envían a IA** (privacidad)
-- ⚡ **Fallback automático** si Ollama no disponible
-- ⏱️ **Timeout de 120 segundos**
+-  **Las imágenes NUNCA se envían a IA** (privacidad)
+-  **Fallback automático** si Ollama no disponible
+-  **Timeout de 120 segundos**
 
-#### Modo 3️⃣ - Dictado por Voz 🎤 (Nuevo en Sprint 3)
+#### Modo 3️ - Dictado por Voz  (Nuevo en Sprint 3)
 - **Web Speech API** (navegador nativo)
 - 🇪🇸 **Español** como idioma principal
 - Convertir **voz → texto** automáticamente
 - Editar transcripción antes de enviar
 - Procesado igual que Modo IA (texto libre)
-- ⚠️ Solo en navegadores compatibles (Chrome, Edge, Firefox)
+-  Solo en navegadores compatibles (Chrome, Edge, Firefox)
 
 ---
 
-## 🧠 Integración IA (Ollama + Llama 3)
+##  Integración IA (Ollama + Llama 3)
 
 ### Configuración
 
@@ -220,143 +220,143 @@ hay restos de construcción y vidrios rotos. Esto es un peligro para los peatone
 
 ---
 
-## ✨ Funcionalidades implementadas
+##  Funcionalidades implementadas
 
 ### Autenticación y Gestión de Usuarios
 
 #### Registro
-- ✅ Registro de ciudadanos y administradores
-- ✅ Validación de email único
-- ✅ Contraseña encriptada con bcryptjs (10 salts)
-- ✅ Campos requeridos: nombre, email, contraseña, dirección, tipo y número de identificación
-- ✅ Tipo de identificación: CC, Pasaporte, Extranjería
-- ✅ Token JWT automático después del registro (válido por 30 días)
+-  Registro de ciudadanos y administradores
+-  Validación de email único
+-  Contraseña encriptada con bcryptjs (10 salts)
+-  Campos requeridos: nombre, email, contraseña, dirección, tipo y número de identificación
+-  Tipo de identificación: CC, Pasaporte, Extranjería
+-  Token JWT automático después del registro (válido por 30 días)
 
 #### Login
-- ✅ Inicio de sesión con email y contraseña
-- ✅ Generación de JWT de 30 días
-- ✅ Persistencia en `localStorage` del navegador
-- ✅ Restauración automática de sesión al recargar página
+-  Inicio de sesión con email y contraseña
+-  Generación de JWT de 30 días
+-  Persistencia en `localStorage` del navegador
+-  Restauración automática de sesión al recargar página
 
 #### Perfil de Usuario
-- ✅ **Editar nombre** (mínimo 2 caracteres)
-- ✅ Editar dirección
-- ✅ **Subir y editar foto de perfil** (convertida a base64, almacenada en GridFS)
-- ✅ Ver datos de identificación (no editable desde perfil)
-- ✅ Ver rol actual (Ciudadano / Administrador)
-- ✅ **Fotos de perfil cargan correctamente** en rutas públicas
+-  **Editar nombre** (mínimo 2 caracteres)
+-  Editar dirección
+-  **Subir y editar foto de perfil** (convertida a base64, almacenada en GridFS)
+-  Ver datos de identificación (no editable desde perfil)
+-  Ver rol actual (Ciudadano / Administrador)
+-  **Fotos de perfil cargan correctamente** en rutas públicas
 
 #### Logout
-- ✅ Limpiar token y datos de usuario
-- ✅ Redirigir a login
+-  Limpiar token y datos de usuario
+-  Redirigir a login
 
 ### Gestión de Reportes
 
 #### Crear Reportes
-- ✅ **Modo manual:** Ingresar título, descripción, categoría, ubicación, imagen (opcional)
-- ✅ **Modo con IA (Ollama + Llama 3):** Procesar texto libre con modelo local LLM ⭐
-- ✅ **Modo voz (dictado en español):** Web Speech API + procesamiento como IA ⭐
-- ✅ Categorías disponibles: Basura, Alumbrado, Hueco, Inseguridad, Ruido, Contaminación, Seguridad, Otro
-- ✅ Validación de campos mínimos
-- ✅ Fallback automático si Ollama no está disponible
-- ✅ Adjuntar imagen (máx ~5 MB, almacenada en GridFS)
-- ✅ **Las imágenes NUNCA se envían a IA** (privacidad garantizada)
+-  **Modo manual:** Ingresar título, descripción, categoría, ubicación, imagen (opcional)
+-  **Modo con IA (Ollama + Llama 3):** Procesar texto libre con modelo local LLM 
+-  **Modo voz (dictado en español):** Web Speech API + procesamiento como IA 
+-  Categorías disponibles: Basura, Alumbrado, Hueco, Inseguridad, Ruido, Contaminación, Seguridad, Otro
+-  Validación de campos mínimos
+-  Fallback automático si Ollama no está disponible
+-  Adjuntar imagen (máx ~5 MB, almacenada en GridFS)
+-  **Las imágenes NUNCA se envían a IA** (privacidad garantizada)
 
 #### Listado de Reportes
-- ✅ **Ciudadano:** Ve solo sus reportes
-- ✅ **Administrador:** Ve todos los reportes del sistema
-- ✅ Filtros disponibles:
+-  **Ciudadano:** Ve solo sus reportes
+-  **Administrador:** Ve todos los reportes del sistema
+-  Filtros disponibles:
   - Por estado (Pendiente, En proceso, Resuelto)
   - Por búsqueda de título/descripción
   - Por rango de fechas
   - Por nombre de usuario (solo admin)
-- ✅ **Información completa del reportante:**
+-  **Información completa del reportante:**
   - Nombre, correo, dirección
   - Tipo y número de identificación
   - Fecha del reporte
 
 #### Cambiar Estado del Reporte
-- ✅ **Solo administrador** puede cambiar estado
-- ✅ Estados disponibles: Pendiente → En proceso → Resuelto
-- ✅ Cambio visual inmediato en la UI
-- ✅ Notificación automática al ciudadano por correo
+-  **Solo administrador** puede cambiar estado
+-  Estados disponibles: Pendiente → En proceso → Resuelto
+-  Cambio visual inmediato en la UI
+-  Notificación automática al ciudadano por correo
 
 #### Notificaciones por Correo
-- ✅ Confirmación de reporte creado
-- ✅ Datos incluidos: título, estado, categoría, ubicación, nombre y email del reportante
-- ✅ Servicio opcional (graceful degradation si SMTP no configurado)
-- ✅ Envío **asincrónico** (no bloquea la operación)
-- ✅ Notificación automática cuando estado cambia (pendiente → resuelto)
+-  Confirmación de reporte creado
+-  Datos incluidos: título, estado, categoría, ubicación, nombre y email del reportante
+-  Servicio opcional (graceful degradation si SMTP no configurado)
+-  Envío **asincrónico** (no bloquea la operación)
+-  Notificación automática cuando estado cambia (pendiente → resuelto)
 
 ### Gestión de Archivos (GridFS)
 
 #### Fotos de Perfil
-- ✅ Almacenadas en MongoDB GridFS (colección `sivur_fs`)
-- ✅ Ruta **pública** (sin autenticación): `/api/files/:id/public`
-- ✅ Cache de 24 horas para optimizar rendimiento
-- ✅ Eliminación de foto anterior al subir nueva
-- ✅ Metadatos: tipo ('perfil'), userId
+-  Almacenadas en MongoDB GridFS (colección `sivur_fs`)
+-  Ruta **pública** (sin autenticación): `/api/files/:id/public`
+-  Cache de 24 horas para optimizar rendimiento
+-  Eliminación de foto anterior al subir nueva
+-  Metadatos: tipo ('perfil'), userId
 
 #### Imágenes de Reportes
-- ✅ Almacenadas en MongoDB GridFS
-- ✅ Ruta **autenticada** (requiere JWT): `/api/files/:id`
-- ✅ Verificación de permisos: creador, admin, o usuario del reporte
-- ✅ Metadatos: tipo ('reporte'), creatorId
+-  Almacenadas en MongoDB GridFS
+-  Ruta **autenticada** (requiere JWT): `/api/files/:id`
+-  Verificación de permisos: creador, admin, o usuario del reporte
+-  Metadatos: tipo ('reporte'), creatorId
 
 ### UI/UX y Frontend
 
 #### Tema y Diseño
-- ✅ Sistema de tema claro/oscuro con persistencia en `localStorage`
-- ✅ Diseño responsive (móvil, tablet, escritorio)
-- ✅ Paleta corporativa:
+-  Sistema de tema claro/oscuro con persistencia en `localStorage`
+-  Diseño responsive (móvil, tablet, escritorio)
+-  Paleta corporativa:
   - Verde principal (#1b854d)
   - Naranja de acento (#f97316)
   - Colores neutros escalables
-- ✅ Variables CSS centralizadas
-- ✅ Microinteracciones en botones, inputs, tarjetas
-- ✅ Animaciones suaves con Framer Motion
+-  Variables CSS centralizadas
+-  Microinteracciones en botones, inputs, tarjetas
+-  Animaciones suaves con Framer Motion
 
 #### Navegación Principal
-- ✅ Crear reporte
-- ✅ Listar reportes / Reportes atendidos
-- ✅ Perfil de usuario
-- ✅ Administración (solo admin)
-- ✅ Chatbot (placeholder para futuras integraciones)
+-  Crear reporte
+-  Listar reportes / Reportes atendidos
+-  Perfil de usuario
+-  Administración (solo admin)
+-  Chatbot (placeholder para futuras integraciones)
 
 #### Componentes Reutilizables
-- ✅ Button (primario, secundario, ghost)
-- ✅ Card (contenedores flexibles)
-- ✅ Input (texto con validación)
-- ✅ Modal (edición de perfil, confirmaciones)
-- ✅ SelectField (dropdowns)
-- ✅ Textarea (descripciones largas)
-- ✅ PageLoader (pantalla de carga)
-- ✅ UserAvatar (foto con fallback a inicial)
+-  Button (primario, secundario, ghost)
+-  Card (contenedores flexibles)
+-  Input (texto con validación)
+-  Modal (edición de perfil, confirmaciones)
+-  SelectField (dropdowns)
+-  Textarea (descripciones largas)
+-  PageLoader (pantalla de carga)
+-  UserAvatar (foto con fallback a inicial)
 
 #### Notificaciones
-- ✅ Toast notifications (react-hot-toast)
-- ✅ Posicionamiento superior
-- ✅ Estilos adaptados al tema actual
-- ✅ Duración: 3.8 segundos
+-  Toast notifications (react-hot-toast)
+-  Posicionamiento superior
+-  Estilos adaptados al tema actual
+-  Duración: 3.8 segundos
 
-#### Dictado por Voz 🎤 (Sprint 3)
-- ✅ **Web Speech API** integrada en navegador
-- ✅ 🇪🇸 **Español** como idioma de reconocimiento
-- ✅ Actualización en tiempo real mientras habla
-- ✅ Editar transcripción antes de enviar
-- ✅ Control de inicio/parada
-- ✅ Fallback para navegadores no compatibles
-- ✅ Manejo de errores (micrófono bloqueado, sin permisos)
+#### Dictado por Voz  (Sprint 3)
+-  **Web Speech API** integrada en navegador
+-  🇪🇸 **Español** como idioma de reconocimiento
+-  Actualización en tiempo real mientras habla
+-  Editar transcripción antes de enviar
+-  Control de inicio/parada
+-  Fallback para navegadores no compatibles
+-  Manejo de errores (micrófono bloqueado, sin permisos)
 
 #### Administración (Admin Panel)
-- ✅ Listar usuarios (filtrar por rol)
-- ✅ Ver detalles de cada usuario
-- ✅ Acceso a reportes de usuario específico
-- ✅ Cambiar estado de reportes desde lista
+-  Listar usuarios (filtrar por rol)
+-  Ver detalles de cada usuario
+-  Acceso a reportes de usuario específico
+-  Cambiar estado de reportes desde lista
 
 ---
 
-## 🏗️ Estructura del proyecto
+##  Estructura del proyecto
 
 ```
 SIVU_Primera_Prueba/
@@ -476,7 +476,7 @@ SIVU_Primera_Prueba/
 
 ---
 
-## 🛠️ Stack tecnológico
+##  Stack tecnológico
 
 ### Backend
 - **Runtime:** Node.js 18+
@@ -505,7 +505,7 @@ SIVU_Primera_Prueba/
 
 ---
 
-## 📋 Requisitos previos
+##  Requisitos previos
 
 - **Node.js** 18.0.0 o superior
 - **npm** 9.0.0 o superior
@@ -522,7 +522,7 @@ mongod --version  # v4.x.x
 
 ---
 
-## 🚀 Ejecución rápida
+##  Ejecución rápida
 
 ### Método 1: Automatizado (Windows)
 
@@ -560,7 +560,7 @@ Abre `http://localhost:5173` en tu navegador.
 
 ---
 
-## 🗄️ Modelos de datos
+##  Modelos de datos
 
 ### Usuario
 
@@ -672,7 +672,7 @@ Abre `http://localhost:5173` en tu navegador.
 
 ---
 
-## 🔌 API REST
+##  API REST
 
 ### Base URL
 ```
@@ -687,7 +687,7 @@ Content-Type: application/json
 
 ---
 
-### 🔐 Autenticación
+###  Autenticación
 
 #### POST `/auth/registro`
 Crear nuevo usuario.
@@ -774,7 +774,7 @@ Actualizar perfil (nombre, dirección, foto).
 
 ---
 
-### 📝 Reportes
+###  Reportes
 
 #### POST `/reportes`
 Crear reporte (3 modos: manual, IA, voz).
@@ -867,7 +867,7 @@ Cambiar estado del reporte (solo admin).
 
 ---
 
-### 🖼️ Archivos
+###  Archivos
 
 #### GET `/files/:id/public`
 Descargar foto de perfil (sin autenticación).
@@ -881,7 +881,7 @@ Descargar archivo (requiere autenticación y permisos).
 
 ---
 
-### 👨‍💼 Administración
+###  Administración
 
 #### GET `/admin/usuarios`
 Listar usuarios (solo admin).
@@ -899,7 +899,7 @@ Listar usuarios (solo admin).
 
 ---
 
-## 📱 Casos de uso
+##  Casos de uso
 
 ### Caso 1: Ciudadano reporta un hueco
 
@@ -942,7 +942,7 @@ Listar usuarios (solo admin).
 
 ---
 
-## ⚙️ Configuración
+##  Configuración
 
 ### Variables de entorno - Backend
 
@@ -1063,7 +1063,7 @@ import.meta.env.VITE_API_ORIGIN  // Configurable en .env.production
 
 ---
 
-## 🔄 Flujo de autenticación
+##  Flujo de autenticación
 
 ```
 ┌─────────────────┐
@@ -1104,7 +1104,7 @@ import.meta.env.VITE_API_ORIGIN  // Configurable en .env.production
 
 ---
 
-## 📊 Arquitectura y patrones
+##  Arquitectura y patrones
 
 ### Backend
 
@@ -1140,7 +1140,7 @@ App.jsx
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### "MongoDB no está conectado"
 - Verificar que MongoDB esté corriendo: `net start MongoDB`
@@ -1159,7 +1159,7 @@ App.jsx
 - Limpiar cache del navegador
 - Usar DevTools → Network para ver si 404 o error de permisos
 
-### "Ollama no disponible / Modo IA no funciona" ⭐
+### "Ollama no disponible / Modo IA no funciona" 
 - Verificar que Ollama esté corriendo: `ollama serve`
 - Verificar endpoint en `.env`: `OLLAMA_BASE_URL=http://localhost:11434`
 - Verificar que Llama 3 está descargado: `ollama list`
@@ -1175,7 +1175,7 @@ App.jsx
 
 ### "Dictado por voz no funciona" 🎤
 - Navegador no soporta Web Speech API (Opera, Safari antiguo)
-- ⚠️ **HTTPS requerido en producción** (localhost funciona en HTTP)
+-  **HTTPS requerido en producción** (localhost funciona en HTTP)
 - Verificar permisos de micrófono en navegador
 - Probar en Chrome, Edge, Firefox (recomendado)
 - Ver consola del navegador para errores específicos
@@ -1200,9 +1200,9 @@ App.jsx
 
 ---
 
-## 📈 Próximos pasos (Roadmap)
+##  Próximos pasos (Roadmap)
 
-### Sprint 4: Geolocalización y Mapas 🗺️
+### Sprint 4: Geolocalización y Mapas 
 - [ ] Integración con Google Maps / Leaflet
 - [ ] Marcar ubicación en mapa al crear reporte
 - [ ] Ver reportes en mapa (clustering)
@@ -1210,7 +1210,7 @@ App.jsx
 - [ ] Detectar ubicación por GPS
 - [ ] Mostrar zona de cobertura de municipios
 
-### Sprint 5: Notificaciones en Tiempo Real ⚡
+### Sprint 5: Notificaciones en Tiempo Real 
 - [ ] WebSockets para actualizaciones live
 - [ ] Notificaciones push en navegador
 - [ ] Notificaciones SMS (Twilio)
@@ -1218,7 +1218,7 @@ App.jsx
 - [ ] Comentarios en reportes (admin ↔ ciudadano)
 - [ ] Menciones y tags
 
-### Sprint 6: Analytics y Dashboard 📊
+### Sprint 6: Analytics y Dashboard 
 - [ ] Dashboard admin con métricas
 - [ ] Reportes por mes, categoría, estado, zona
 - [ ] Gráficos (Chart.js o similar)
@@ -1226,7 +1226,7 @@ App.jsx
 - [ ] KPIs de respuesta y resolución
 - [ ] Heatmap de incidencias por zona
 
-### Sprint 7: Seguridad Avanzada 🔒
+### Sprint 7: Seguridad Avanzada 
 - [ ] Two-Factor Authentication (2FA) con TOTP
 - [ ] Rate limiting en APIs
 - [ ] Validación CSRF
@@ -1234,7 +1234,7 @@ App.jsx
 - [ ] Encriptación de datos sensibles
 - [ ] Backup automático de BD
 
-### Sprint 8: Chatbot IA Avanzado 🤖
+### Sprint 8: Chatbot IA Avanzado 
 - [ ] Chatbot con IA integrado (Ollama o API)
 - [ ] Asistente para crear reportes
 - [ ] FAQ automático por categoría
@@ -1242,7 +1242,7 @@ App.jsx
 - [ ] Sugerencias de reportes duplicados
 - [ ] Análisis de sentimiento
 
-### Sprint 9: App Móvil 📱
+### Sprint 9: App Móvil 
 - [ ] React Native / Expo
 - [ ] Sincronización offline-first
 - [ ] Acceso a cámara nativa
@@ -1250,7 +1250,7 @@ App.jsx
 - [ ] Notificaciones push
 - [ ] Escaneo de códigos QR
 
-### Sprint 10: Integraciones Externas 🔗
+### Sprint 10: Integraciones Externas 
 - [ ] API pública para terceros
 - [ ] Webhooks para eventos
 - [ ] SSO (Single Sign-On)
@@ -1258,7 +1258,7 @@ App.jsx
 - [ ] Exportación a sistemas SCADA
 - [ ] Integración con ciudades inteligentes (IoT)
 
-### Sprint 11+: Innovaciones Futuras 🚀
+### Sprint 11+: Innovaciones Futuras 
 - [ ] IA multimodal (imagen + texto en reportes)
 - [ ] Detección automática de tipo de incidencia por foto
 - [ ] Ruta óptima para equipos de mantenimiento
@@ -1268,14 +1268,14 @@ App.jsx
 
 ---
 
-## 👥 Equipo de desarrollo
+##  Equipo de desarrollo
 
 - **Daniel Santiago Rodríguez Gerena** - Full Stack
 - **Juan José Oquendo Jaramillo** - Full Stack
 
 ---
 
-## 📄 Licencia
+##  Licencia
 
 Proyecto académico para fines educativos e investigación. No comercial.
 
@@ -1283,7 +1283,7 @@ Proyecto académico para fines educativos e investigación. No comercial.
 
 ---
 
-## 📞 Contacto y Soporte
+##  Contacto y Soporte
 
 Para reportar bugs, sugerencias o preguntas:
 - GitHub Issues (futuro)
@@ -1292,9 +1292,9 @@ Para reportar bugs, sugerencias o preguntas:
 
 ---
 
-## ✅ Checklist de Implementación por Sprint
+##  Checklist de Implementación por Sprint
 
-### ✅ Sprint 1 (MVP) - Completado
+###  Sprint 1 (MVP) - Completado
 - [x] Autenticación JWT básica
 - [x] Registro y login
 - [x] Modelo Usuario + Reporte
@@ -1303,7 +1303,7 @@ Para reportar bugs, sugerencias o preguntas:
 - [x] UI responsive
 - [x] Tema claro/oscuro
 
-### ✅ Sprint 2 - Completado
+###  Sprint 2 - Completado
 - [x] GridFS para imágenes
 - [x] Fotos de perfil
 - [x] Imágenes en reportes
@@ -1311,7 +1311,7 @@ Para reportar bugs, sugerencias o preguntas:
 - [x] Cliente Ollama (IA local)
 - [x] Fallback manual sin IA
 
-### ✅ Sprint 3 - Completado ⭐
+###  Sprint 3 - Completado ⭐
 - [x] Editar nombre usuario
 - [x] Editar dirección
 - [x] Subir foto de perfil
@@ -1325,7 +1325,7 @@ Para reportar bugs, sugerencias o preguntas:
 - [x] Fallback automático si Ollama no disponible
 - [x] Información completa del reportante en cada reporte
 
-### 📋 Sprint 4 (Próximo)
+###  Sprint 4 (Próximo)
 - [ ] Mapas interactivos (Google Maps / Leaflet)
 - [ ] Geolocalización automática
 - [ ] Clustering de reportes por zona
@@ -1335,5 +1335,5 @@ Para reportar bugs, sugerencias o preguntas:
 **Última actualización:** 11 de Mayo de 2026  
 **Versión:** 3.0.0 (Sprint 3 - Completo)  
 **Modelo IA:** Llama 3 (vía Ollama)  
-**Status:** ✅ Producción-ready (MVP funcional)
+**Status:**  Producción-ready (MVP funcional actualizado)
 
